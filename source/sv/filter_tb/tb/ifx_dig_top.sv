@@ -68,8 +68,8 @@ module ifx_dig_top;
     //===========================================================================
 
     // TODO: --  add here instance for DUT
-        top_filter_bank #(.N('FILT_NB)) DUT (
-        .clk(clk),
+    top_filter_bank #(.N(`FILT_NB)) DUT (
+        .clk_i(clk),
         .rstn_i(rstn_i_w),
 
         // system data communication interface
@@ -85,7 +85,7 @@ module ifx_dig_top;
         // system outputs
         .data_out(data_out_w),
         .int_pulse_out(int_pulse_out_w)
-    )
+    );
 
     //===========================================================================
     //              INTERFACES
@@ -110,7 +110,7 @@ module ifx_dig_top;
         // system outputs
         .data_out(data_out_w),
         .int_pulse_out(int_pulse_out_w)
-    );
+    );
 
     //===========================================================================
     // interconnect module and/or interface UVCs
@@ -149,22 +149,23 @@ module ifx_dig_top;
     //===========================CLOCKS=============================
     // TODO: Modify generate_clock task call so that a 100 MHz will be generated
     initial begin
-        generate_clock();
+        generate_clock("ns",10);
     end
 
     // TODO: Write a task capable of generating a clock signal
     task generate_clock(string time_unit = "us", bit [31:0] period = 1);
         int clk_half_per_ps;
         case(time_unit)
-        "ns":clk_half_per_ps= period*1000/2;
-        "us":clk_half_per_ps= period*1e6/2;
-        "ms":clk_half_per_ps= period*1e9/2;
+        "ns": clk_half_per_ps = period*1000/2;
+        "us": clk_half_per_ps = period*1e6/2;
+        "ms": clk_half_per_ps = period*1e9/2;
         endcase
-        clk=0;
+        clk = 0;
         forever begin
-            #(clk_half_per_ps*1ps) clk=!clk;
+            #(clk_half_per_ps * 1ps) clk = !clk;
         end
-    endtask
+
+    endtask
 
     //===========================================================================
     // pass virtual interfaces to the testbench
@@ -177,5 +178,5 @@ module ifx_dig_top;
         // interfaces for UVCs
         uvm_config_db #(virtual ifx_dig_data_bus_uvc_interface)::set(uvm_top, "data_bus_uvc_agt", "vif", data_uvc_if);
 
-    end
+    end
 endmodule
